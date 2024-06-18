@@ -1,0 +1,58 @@
+# Build Artifacts
+/build/*
+/build/*.log
+/build/*.tmp
+/build/*.o
+/build/*.a
+/build/temp/
+/build/debug/
+/.build/*
+/cmake-build-debug/*
+
+# CMake Generated Files
+/CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.make
+
+# Editor and IDE specific files and directories
+.vscode/
+.idea/
+
+# Operating System Generated Files
+.DS_Store
+Thumbs.db
+
+# Ignore Doxygen documentation output
+/docs/html/
+/docs/latex/
+/docs/man/
+/docs/xml/
+
+# Vim
+*.swp
+*.swo
+*~
+
+# User-specific files
+*.user
+*.suo
+
+# Ignore backup files and directories
+*~
+*.bak
+*.backup
+*.tmp
+*.temp
+
+# grpc and protobuf
+/grpc/*
+/protobuf/*
+/.git
+
+# app
+*.mp4
+
+#clang
+*.log

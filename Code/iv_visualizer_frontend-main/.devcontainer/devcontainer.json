@@ -1,0 +1,18 @@
+{
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools-extension-pack",
+        "ms-azuretools.vscode-docker",
+        "zxh404.vscode-proto3"
+      ]
+    }
+  },
+  "name": "iv_container",
+  "runArgs": ["-e",
+   "DISPLAY=host.docker.internal:0",
+  "--network=ivNet"]
+}

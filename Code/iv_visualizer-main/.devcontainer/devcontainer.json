@@ -1,0 +1,6 @@
+{
+  "name": "iv_visualizer",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "backend",
+  "workspaceFolder": "/workspaces/iv_visualizer/"
+}

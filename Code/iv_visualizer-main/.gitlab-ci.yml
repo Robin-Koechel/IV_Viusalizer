@@ -1,0 +1,53 @@
+default:
+  image: registry.gitlab.cc-asp.fraunhofer.de/cormier_students/docker-images/ubuntu_22.04:iv.visualizer.dev
+  tags:
+  - vid
+
+stages:
+  - style_check
+  - build
+  - test
+  - documentation 
+
+variables:
+  BUILD_DIR: build
+  PROTOBUF_VERSION: "25.2"
+  DEBIAN_FRONTEND: noninteractive 
+  GIT_SUBMODULE_STRATEGY: recursive
+
+style_check:
+  stage: style_check
+  script:
+    - clang-format --version
+    - clang-tidy --version
+    #- bash scripts/style_check.sh
+
+build:
+  stage: build
+  script:
+    - bash build.sh 
+  artifacts: 
+    paths:
+      - build
+
+test:
+  stage: test
+  services:
+    - name: scylladb/scylla:5.4
+      alias: scylla
+  variables:
+    SCYLLA_IP: "scylla"
+  script:
+    - cd ${BUILD_DIR}/test
+    - ./IV_VISUALIZER_test
+  dependencies:
+    - build
+
+documentation:
+  stage: documentation
+  script:
+    - doxygen Doxyfile
+    - mv docs/html/ public/
+  artifacts:
+    paths:
+      - public

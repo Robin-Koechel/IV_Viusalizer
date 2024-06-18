@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+    dummy:
+        build:
+            context: ..
+            dockerfile: .devcontainer/Dockerfile
+        volumes:
+            - ..:/workspaces/iv_dummy/
+        command: sleep infinity
+        networks:
+            - ivNet
+
+networks:
+    ivNet:
+        external: true
+        name: ivNet
+        driver: bridge

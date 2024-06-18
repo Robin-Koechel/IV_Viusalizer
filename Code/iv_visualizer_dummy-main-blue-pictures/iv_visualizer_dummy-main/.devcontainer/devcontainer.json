@@ -1,0 +1,6 @@
+{
+    "name": "iv_dummy",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "dummy",
+    "workspaceFolder": "/workspaces/iv_dummy/"
+  }

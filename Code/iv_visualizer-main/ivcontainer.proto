@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package ivcontainerpipeline;
+
+// IvService defines the RPC methods available for the container pipeline.
+service IvService {
+  // Initializes the services and returns the current configuration.
+  // = read config, init GStreamer and Detector.
+  rpc Init(Empty) returns (ConfigResponseMessage) {}
+  // Begins the data stream. = start GStreamer -> get frame -> forward(frame)
+  // Detector -> write to stream.
+  rpc Start(Empty) returns (stream DataStream) {}
+  // Ends the data stream and returns an informational message.
+  rpc Stop(Empty) returns (InfoMessage) {}
+  // Updates the configuration of the Container / GStreamer / Detector.
+  rpc UpdateConfig(SetConfig) returns (ConfigResponseMessage) {}
+  // Retrieves the current configuration.
+  rpc GetConfig(Empty) returns (ConfigResponseMessage) {}
+}
+
+// Placeholder message for requests that don't require input parameters.
+message Empty {}
+
+// Holds general configuration settings for the pipeline.
+message ConfigContainer {
+  bool log_info = 1;
+  bool log_debug = 2;
+  // Quality factor must be in range 0 to 100, or -1
+  // More infos: https://doc.qt.io/qt-6/qimage.html#save
+  int32 jpg_image_quality = 3;
+}
+
+// Defines the types of inference supported.
+enum InferenceType {
+  ONNX_CPU = 0;    // CPU.
+  ONNX_GPU = 1;    // GPU Cuda.
+  TRT_FLOAT16 = 2; // GPU TensorRT via trt_model_handler.
+  TRT_FLOAT32 = 3; // GPU TensorRT via trt_model_handler.
+}
+
+// Defines a simple 2D point with integer coordinates.
+message Point {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+// Defines whether a region of interest is inside or outside a boundary.
+enum RoiType {
+  INSIDE = 0;
+  OUTSIDE = 1;
+}
+
+// Defines a region of interest, which can be a polygonal area.
+message Roi {
+  string name = 1;
+  int32 id = 2;
+  RoiType type = 3;           // Type of the region (inside or outside)
+  repeated Point polygon = 4; // The points defining the polygon of the RoI
+}
+
+// Holds a list of RoIs
+message RoiList { repeated Roi items = 1; }
+
+// Specifies configuration for the detector.
+message ConfigDetector {
+  InferenceType inference_type = 1;
+  int32 cuda_device = 2;
+  float nms_threshold = 3;
+  float confidence_threshold = 4;
+  RoiList rois = 5;
+}
+
+// Specifies configuration for the GStreamer.
+message ConfigGStreamer {
+  string stream_url = 1; // rtsp://user:pw@ip:port/media
+  int32 target_fps = 2;
+  // If width and height are -1, the standard resolution of the rtsp stream is
+  // used.
+  optional int32 custom_size_width = 3;
+  optional int32 custom_size_height = 4;
+}
+
+// Allows modification of the configuration.
+message SetConfig {
+  oneof change {
+    ConfigContainer config_container = 1;
+    ConfigDetector config_detector = 2;
+    ConfigGStreamer config_gstreamer = 3;
+  }
+}
+
+// Is used to return the current configuration.
+message ConfigResponseMessage {
+  ConfigContainer config_container = 1;
+  ConfigDetector config_detector = 2;
+  ConfigGStreamer config_gstreamer = 3;
+}
+
+// Carries a informational message.
+message InfoMessage { string info = 1; }
+
+// Defines a single bounding box in an image
+message BoundingBoxData {
+  // Rectangle is currently in TLWH format.
+  float x1 = 1;
+  float y1 = 2;
+  float x2 = 3;
+  float y2 = 4;
+  float confidence = 5; // Confidence score of the detection [0.0-1.0].
+  string label = 6;     // Label of the detected object.
+}
+
+// Holds a list of bounding boxes detected in a single frame.
+message BoundingBoxList { repeated BoundingBoxData items = 1; }
+
+// Provides additional information about an image.
+message Metadata {
+  int32 width = 1;
+  int32 height = 2;
+  uint64 data_len = 3;  // Length of the image data.
+}
+
+// Holds the actual image data along with its metadata.
+message ImageData {
+  bytes data = 1;         // The binary image data
+  Metadata meta_data = 2; // Associated metadata.
+}
+
+message ImageAndBoundingBox {  
+  optional BoundingBoxList boundingboxes = 2;
+  ImageData image = 3;
+  uint64 timestamp = 4; // Timestamp of the image from GStreamer (UTC + 1).
+  optional RoiList roi_list = 5;
+}
+
+// Defines the structure of the streamed data.
+message DataStream {
+  optional InfoMessage info = 1;
+  optional ImageAndBoundingBox data = 2;
+}

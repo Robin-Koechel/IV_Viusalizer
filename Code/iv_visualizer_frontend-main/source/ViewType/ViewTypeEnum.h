@@ -1,0 +1,11 @@
+#ifndef VIEWTYPEENUM_H
+#define VIEWTYPEENUM_H
+
+enum class ViewTypeEnum
+{
+    ONLY_VIDEO,
+    ANNOTATION_AND_VIDEO,
+    ANNOTATION_WITHOUT_VIDEO
+};
+
+#endif // VIEWTYPEENUM_H

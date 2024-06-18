@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+
+    backend:
+        container_name: iv_backend
+        build:
+            context: ..
+            dockerfile: .devcontainer/Dockerfile
+        depends_on:
+            - scylla
+        volumes:
+            - ..:/workspaces/iv_visualizer/
+        command: sleep infinity
+        environment:
+            - SCYLLA_IP=scylla
+        networks:
+            - ivNet
+
+
+    scylla:
+        container_name: scylla
+        image: scylladb/scylla:5.4
+        volumes:
+            - scylla_data:/var/lib/scylla
+        networks:
+            - ivNet
+
+
+volumes:
+  scylla_data:
+
+
+networks:
+    ivNet:
+        external: true
+        name: ivNet
+        driver: bridge

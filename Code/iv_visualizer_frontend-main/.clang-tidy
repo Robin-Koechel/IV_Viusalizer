@@ -1,0 +1,63 @@
+Checks: "bugprone-*,\
+-bugprone-narrowing-conversions,\
+clang-analyzer-*,\
+modernize-*,\
+-modernize-use-bool-literals,\
+-modernize-pass-by-value,\
+-modernize-use-auto,\
+-modernize-raw-string-literal,\
+-modernize-return-braced-init-list,\
+-modernize-use-trailing-return-type,\
+-modernize-use-nodiscard,\
+cppcoreguidelines-*,\
+-cppcoreguidelines-pro-type-vararg,\
+-cppcoreguidelines-pro-bounds-array-to-pointer-decay,\
+-cppcoreguidelines-narrowing-conversions,\
+-cppcoreguidelines-avoid-non-const-global-variables,\
+misc-*,\
+-misc-non-private-member-variables-in-classes,\
+-misc-no-recursion,\
+llvm-namespace-comment,\
+readability-*,\
+-readability-implicit-bool-cast,\
+-readability-else-after-return,\
+-readability-redundant-declaration,\
+-readability-named-parameter,\
+-readability-braces-around-statements,\
+-readability-implicit-bool-conversion,\
+-readability-uppercase-literal-suffix,\
+performance-*,\
+-performance-no-automatic-move,\
+-clang-analyzer-core.CallAndMessage,\
+-clang-analyzer-security.FloatLoopCounter,\
+-clang-diagnostic-zero-as-null-pointer-constant,\
+-clang-diagnostic-c99-extensions,\
+-clang-diagnostic-double-promotion,\
+google-explicit-constructor,\
+-readability-magic-numbers,\
+-cppcoreguidelines-avoid-magic-numbers,\
+-cppcoreguidelines-non-private-member-variables-in-classes"
+
+CheckOptions:
+  - key:    modernize-use-override.AllowOverrideAndFinal
+    value:  true
+  - key:    cppcoreguidelines-explicit-virtual-functions.AllowOverrideAndFinal
+    value:  true
+
+#TODO the following warnings were disabled because clang-10 introduced a lot more warnings which are useful but should be enabled one after another because otherwise the number of warnings is overwhelming
+#-readability-magic-numbers,\
+#-cppcoreguidelines-avoid-magic-numbers,\
+#-cppcoreguidelines-non-private-member-variables-in-classes
+#-cppcoreguidelines-avoid-non-const-global-variables
+
+
+#cppcoreguidelines-pro-type-vararg is raised by ROS_INFO/ROS_WARN etc.
+#cppcoreguidelines-pro-bounds-array-to-pointer-decay is raised by ROS_INFO/ROS_WARN etc.
+#clang-analyzer-core.CallAndMessage is raised by localization for strange reasons.
+#clang-diagnostic-c99-extensions is raised by designated initializer lists.
+
+#Note: there are some .clang-tidy files in subdirectories:
+#navigation/path_planning because ceres forces us to use pointer arithmetric.
+#monitoring/system_monitor because boost::algorithm::split produces false positive warnings there
+#common/test because a warning in /opt/ros/noetic/include/pluginlib/./class_loader_imp.hpp
+#perception/parallel_parking because a warning in /usr/include/pcl-1.10/pcl/sample_consensus/sac_model.h

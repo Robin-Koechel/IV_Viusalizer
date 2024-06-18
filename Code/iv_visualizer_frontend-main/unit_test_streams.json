@@ -1,0 +1,53 @@
+[
+    {
+        "stream_confidence_threshold": 176,
+        "stream_cuda_device": -280002304,
+        "stream_custom_size_height": 0,
+        "stream_custom_size_width": 0,
+        "stream_inference_type": 0,
+        "stream_log_debug": false,
+        "stream_log_info": true,
+        "stream_name": "",
+        "stream_nms_threshold": 0,
+        "stream_reader_url": "myUrl",
+        "stream_regions_of_interest": [
+        ],
+        "stream_target_fps": 0,
+        "stream_url": "URL",
+        "stream_writer_url": "myUrl"
+    },
+    {
+        "stream_confidence_threshold": 0,
+        "stream_cuda_device": -285117152,
+        "stream_custom_size_height": 0,
+        "stream_custom_size_width": 0,
+        "stream_inference_type": 28722,
+        "stream_log_debug": true,
+        "stream_log_info": true,
+        "stream_name": "",
+        "stream_nms_threshold": 4.73458292214194e-310,
+        "stream_reader_url": "myUrl",
+        "stream_regions_of_interest": [
+        ],
+        "stream_target_fps": 0,
+        "stream_url": "URL",
+        "stream_writer_url": "myUrl"
+    },
+    {
+        "stream_confidence_threshold": 176,
+        "stream_cuda_device": -284378672,
+        "stream_custom_size_height": 0,
+        "stream_custom_size_width": 0,
+        "stream_inference_type": 0,
+        "stream_log_debug": true,
+        "stream_log_info": true,
+        "stream_name": "",
+        "stream_nms_threshold": 6.09495263963053e-310,
+        "stream_reader_url": "myUrl",
+        "stream_regions_of_interest": [
+        ],
+        "stream_target_fps": 0,
+        "stream_url": "URL",
+        "stream_writer_url": "myUrl"
+    }
+]

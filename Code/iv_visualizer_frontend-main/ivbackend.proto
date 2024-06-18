@@ -1,0 +1,175 @@
+syntax = "proto3";
+
+package ivbackend; 
+
+service IvBackendService {
+    rpc getImages(ImageRequest) returns (stream DataStream) {}
+    rpc startIncomingStream(StreamIdentifier) returns (InitialisationMessage) {}
+    // TODO Maybe change to RangeInfo, might be useful to know all ranges once 
+    // you end a stream 
+    rpc stopIncomingStream(StreamIdentifier) returns (InitialisationMessage) {}
+    rpc setConfig(SetConfigMessage) returns (Empty) {}
+    rpc getConfig(StreamIdentifier) returns (ConfigResponseMessage) {}
+    rpc getRange(StreamIdentifier) returns (RangeInfo) {}
+    rpc getAvailableUrls(Empty) returns (StreamIdentifierList) {}
+    rpc getLiveImages(ImageRequest) returns (stream DataStream) {}
+    rpc sendTestDataFrame(Empty) returns (stream DataStream) {}
+    rpc sayHello(Empty) returns (HelloResponse) {}
+}
+
+// Common message types
+message Empty {}
+
+message SetConfigMessage {
+    ConfigResponseMessage config = 1;
+    StreamIdentifier identifier = 2;
+}
+
+// Test message
+message HelloResponse {
+    string message = 1;
+}
+
+message StreamIdentifier {
+    string url = 1; // Format: rtsp://user:password@ip:port/media
+}
+
+message StreamIdentifierList {
+    repeated StreamIdentifier urls = 1;
+}
+
+
+message RangeVideos {
+    repeated TimeRange videos = 1;
+}
+
+message RangeAnnotations {
+    repeated TimeRange annotations = 1;
+}
+
+message RangeInfo {
+    RangeVideos range_videos = 1;
+    RangeAnnotations range_annotations = 2;
+}
+
+
+message ImageRequest {
+    StreamIdentifier identifier = 1;
+    TimeRange range = 2;
+    ViewType viewtype = 3;
+}
+
+message TimeRange {
+    uint64 start = 1;
+    uint64 end = 2;
+    uint64 fps = 3;
+}
+
+enum ViewType {
+    UNKNOWN_VIEW_TYPE = 0;
+    ONLY_VIDEO = 1;
+    ANNOTATION_AND_VIDEO = 2;
+    ANNOTATION_WITHOUT_VIDEO = 3;
+}
+
+message InfoMessage {
+    string info = 1;
+}
+
+message ImageData {
+    bytes data = 1;
+    Metadata meta_data = 2;
+}
+
+message Metadata {
+    int32 width = 1;
+    int32 height = 2;
+    uint64 data_len = 3; // Consider removing if the length can be inferred from the data field
+}
+
+message ImageAndAnnotation {  
+    optional BoundingBoxList annotations = 2;
+    ImageData image = 3;
+    uint64 timestamp = 4; // Timestamp of the image from GStreamer (UTC + 1).
+    optional RoiList roi_list = 5;
+}
+  
+  // Defines the structure of the streamed data.
+  message DataStream {
+    optional InfoMessage info = 1;
+    optional ImageAndAnnotation data = 2;
+}
+
+message ConfigContainer {
+    bool log_info = 1;
+    bool log_debug = 2;
+    int32 jpg_image_quality = 3; // Quality factor must be in range 0 to 100, or -1. More info: https://doc.qt.io/qt-6/qimage.html#save
+}
+
+enum InferenceType {
+    ONNX_CPU = 0;
+    ONNX_GPU = 1;
+    TRT_FLOAT16 = 2;
+    TRT_FLOAT32 = 3;
+}
+
+message Point {
+    int32 x = 1;
+    int32 y = 2;
+}
+
+enum RoiType {
+    INSIDE = 0;
+    OUTSIDE = 1;
+}
+
+message Roi {
+    string name = 1;
+    int32 id = 2;
+    RoiType type = 3;
+    repeated Point polygon = 4;
+}
+
+message RoiList {
+    repeated Roi items = 1;
+}
+
+// Defines a single bounding box in an image
+message BoundingBoxData {
+  // Rectangle is currently in TLWH format.
+  float x1 = 1;
+  float y1 = 2;
+  float x2 = 3;
+  float y2 = 4;
+  float confidence = 5; // Confidence score of the detection [0.0-1.0].
+  string label = 6;     // Label of the detected object.
+}
+
+// Holds a list of bounding boxes detected in a single frame.
+message BoundingBoxList { repeated BoundingBoxData items = 1; }
+
+message ConfigDetector {
+    InferenceType inference_type = 1;
+    int32 cuda_device = 2;
+    float nms_threshold = 3;
+    float confidence_threshold = 4;
+    RoiList rois = 5;
+}
+
+message ConfigGStreamer {
+    StreamIdentifier stream_url = 1;
+    int32 target_fps = 2;
+    int32 custom_size_width = 3;
+    int32 custom_size_height = 4;
+}
+
+message ConfigResponseMessage {
+    ConfigContainer config_container = 1;
+    ConfigDetector config_detector = 2;
+    ConfigGStreamer config_gstreamer = 3;
+}
+
+message InitialisationMessage {
+    TimeRange timeRange = 1;
+    ConfigResponseMessage config = 2;
+}
